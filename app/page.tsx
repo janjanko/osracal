@@ -1,65 +1,520 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState, useMemo } from 'react';
+import {
+  Briefcase,
+  GraduationCap,
+  FolderGit2,
+  Mail,
+  Phone,
+  MapPin,
+  ExternalLink,
+  User,
+  Code,
+  Globe,
+  Palette,
+  LucideIcon, // Import LucideIcon type for cleaner prop definitions
+} from 'lucide-react';
+
+// --- Theme Definitions and Types ---
+const themeColors = {
+  orange: { accent: 'orange', code: 'FF5722' },
+  sky: { accent: 'sky', code: '0EA5E9' },
+  emerald: { accent: 'emerald', code: '10B981' },
+  rose: { accent: 'rose', code: 'F43F5E' },
+};
+
+// Define a type for the allowed theme keys (Fixes 7053)
+type ThemeKey = keyof typeof themeColors;
+
+// --- Data Interfaces ---
+interface JobExperience {
+  id: number;
+  title: string;
+  company: string;
+  duration: string;
+  description: string;
+}
+
+interface Education {
+  id: number;
+  degree: string;
+  institution: string;
+  year: string;
+}
+
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  link: string;
+}
+
+interface ContactInfo {
+  email: string;
+  phone: string;
+  location: string;
+}
+
+interface ResumeData {
+  name: string;
+  title: string;
+  imageUrl: string;
+  about: string;
+  contact: ContactInfo;
+  skills: string[];
+  experience: JobExperience[];
+  education: Education[];
+  projects: Project[];
+}
+
+// --- Component Props Interfaces (Fixes 7031) ---
+
+interface ThemeSelectorProps {
+  currentTheme: ThemeKey;
+  setTheme: (theme: ThemeKey) => void;
+}
+
+interface SectionHeaderProps {
+  icon: LucideIcon;
+  title: string;
+  theme: string;
+}
+
+interface CardEntryProps {
+  title: string;
+  subtitle: string;
+  duration: string;
+  description?: string; // Made optional to fix usage in Education section (Fixes 2741)
+  theme: string;
+}
+
+interface ContactItemProps {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  link?: string; // Made optional to fix usage for Location (Fixes 2741)
+  theme: string;
+}
+
+interface ProjectCardProps {
+  project: Project;
+  theme: string;
+}
+
+
+// --- Resume Data ---
+const resumeData: ResumeData = {
+  name: 'John Lloyd Racal',
+  title: 'Full-Stack Developer & Designer',
+  // NOTE: For local images in a Next.js project, place the file (e.g., j.jpg)
+  // in the `/public` folder and reference it with a leading slash, e.g., '/j.jpg'
+  imageUrl: '/j.jpg', 
+  about:
+    'A passionate storyteller and dedicated developer with 7+ years of experience crafting beautiful, responsive web applications. Focused on delivering high-performance, accessible, and scalable solutions using modern technologies. My work emphasizes clean architecture and user-centric design, transforming complex requirements into intuitive digital experiences.',
+  contact: {
+    email: 'b4staracaln1@gmail.com',
+    phone: '09275101841',
+    location: 'Cogon, Cordova Cebu',
+  },
+  skills: [
+    'React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Express', 'PostgreSQL',
+  ],
+  experience: [
+    {
+      id: 1,
+      title: 'McDonalds',
+      company: 'McDonalds Corporation',
+      duration: '2024 — Present',
+      description:
+        'Greeting customers, taking orders, and providing friendly service to ensure a positive dining experience.',
+    }
+  ],
+  education: [
+    {
+      id: 1,
+      degree: 'Bachelor of Science in Information Technology',
+      institution: 'Cordova Public College',
+      year: '2026 - 2027',
+    }
+  ],
+  projects: [
+    {
+      id: 1,
+      name: 'Ecommerce Shop',
+      description: ' An online ecommerce shop',
+      link: 'https://jake-finalproject.vercel.app/',
+    },
+    {
+      id: 2,
+      name: 'Portfolio V4',
+      description: 'Personal responsive portfolio site using Next.js 14, TypeScript and Framer Motion.',
+      link: 'https://portfolio-v4.example.com',
+    },
+    {
+      id: 3,
+      name: 'TaskFlow',
+      description: 'A collaborative project management tool designed for agile teams with real-time updates.',
+      link: 'https://taskflow-app.example.com',
+    },
+  ],
+};
+
+// Component for the floating theme selector
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, setTheme }) => (
+  <div className="fixed top-4 right-4 z-50">
+    <div className="flex items-center space-x-2 bg-gray-800 p-2 rounded-full shadow-2xl border border-gray-700">
+      <Palette className="w-5 h-5 text-gray-400" />
+      {Object.entries(themeColors).map(([key, theme]) => (
+        <button
+          key={key}
+          // The key is safely cast to ThemeKey as it comes from Object.entries(themeColors)
+          onClick={() => setTheme(key as ThemeKey)}
+          className={`w-8 h-8 rounded-full shadow-md transition transform hover:scale-110 border-2 ${
+            currentTheme === key ? `border-white scale-110` : 'border-transparent'
+          } focus:outline-none`}
+          style={{ backgroundColor: `#${theme.code}` }}
+          title={`${theme.accent.charAt(0).toUpperCase() + theme.accent.slice(1)} Theme`}
+        ></button>
+      ))}
+    </div>
+  </div>
+);
+
+// Component for a section header with an icon
+const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, title, theme }) => {
+  // Explicit class map for dynamic classes
+  const iconColor = `text-${theme}-600`;
+  const borderColor = `border-${theme}-600/50`;
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    // Dynamic border-color and text-color
+    <div className={`flex items-center space-x-3 mb-6 border-b ${borderColor} pb-2`}>
+      <Icon className={`w-6 h-6 ${iconColor}`} />
+      <h2 className="text-3xl font-extrabold text-white uppercase tracking-wider">
+        {title}
+      </h2>
     </div>
   );
 }
+
+// Component for a work/education entry
+const CardEntry: React.FC<CardEntryProps> = ({ title, subtitle, duration, description, theme }) => {
+  // Explicit class maps for dynamic classes
+  const borderClassMap: Record<string, string> = {
+    orange: 'border-orange-600',
+    sky: 'border-sky-600',
+    emerald: 'border-emerald-600',
+    rose: 'border-rose-600',
+  };
+  const titleColorMap: Record<string, string> = {
+    orange: 'text-orange-400',
+    sky: 'text-sky-400',
+    emerald: 'text-emerald-400',
+    rose: 'text-rose-400',
+  };
+  const hoverShadowClassMap: Record<string, string> = {
+    orange: 'hover:shadow-orange-600/30',
+    sky: 'hover:shadow-sky-600/30',
+    emerald: 'hover:shadow-emerald-600/30',
+    rose: 'hover:shadow-rose-600/30',
+  };
+
+  const borderClass = borderClassMap[theme] || borderClassMap.orange;
+  const titleColorClass = titleColorMap[theme] || titleColorMap.orange;
+  const hoverShadowClass = hoverShadowClassMap[theme] || hoverShadowClassMap.orange;
+
+  return (
+    // Dynamic border-left color and hover shadow
+    <div className={`bg-gray-800 p-6 rounded-xl shadow-lg ${hoverShadowClass} transition duration-300 border-l-4 ${borderClass} mb-6`}>
+      <div className="flex justify-between items-start mb-2">
+        {/* Dynamic title color */}
+        <h3 className={`text-xl font-bold ${titleColorClass}`}>{title}</h3>
+        <span className="text-sm text-gray-400 font-medium bg-gray-700 px-3 py-1 rounded-full">{duration}</span>
+      </div>
+      <p className="text-gray-300 font-semibold mb-3">{subtitle}</p>
+      {description && (
+        <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+      )}
+    </div>
+  );
+}
+
+// Helper component for Contact Info
+const ContactItem: React.FC<ContactItemProps> = ({ icon: Icon, label, value, link, theme }) => {
+  const iconColor = `text-${theme}-600`;
+  const linkHoverColor = `hover:text-${theme}-400`;
+  return (
+    <div className="flex items-start">
+      {/* Dynamic icon color */}
+      <Icon className={`w-5 h-5 ${iconColor} mt-1 flex-shrink-0`} />
+      <div className="ml-4">
+        <p className="text-sm font-medium text-gray-400">{label}</p>
+        {link ? (
+          // Dynamic link hover color
+          <a href={link} target="_blank" rel="noopener noreferrer" className={`text-white ${linkHoverColor} transition break-all`}>
+            {value}
+          </a>
+        ) : (
+          <p className="text-white">{value}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Helper component for Project Card
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, theme }) => {
+  // Explicit class maps for dynamic classes
+  const iconColor = `text-${theme}-600`;
+  const linkColor = `text-${theme}-400`;
+  const linkHoverColor = `hover:text-${theme}-600`;
+  const hoverShadowClassMap: Record<string, string> = {
+    orange: 'hover:shadow-orange-600/30',
+    sky: 'hover:shadow-sky-600/30',
+    emerald: 'hover:shadow-emerald-600/30',
+    rose: 'hover:shadow-rose-600/30',
+  };
+  const hoverShadowClass = hoverShadowClassMap[theme] || hoverShadowClassMap.orange;
+
+  return (
+    <div className={`bg-gray-800 p-6 rounded-xl shadow-lg ${hoverShadowClass} transition duration-300 flex flex-col justify-between h-full`}>
+      <div>
+        <div className="flex items-center mb-3">
+          {/* Dynamic icon color */}
+          <Globe className={`w-5 h-5 ${iconColor} mr-2`} />
+          <h4 className="text-xl font-bold text-white">{project.name}</h4>
+        </div>
+        <p className="text-gray-400 text-sm mb-4">{project.description}</p>
+      </div>
+      <a
+        href={project.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        // Dynamic text and hover color
+        className={`inline-flex items-center ${linkColor} ${linkHoverColor} font-medium transition group mt-4`}
+      >
+        View Project
+        <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition duration-200" />
+      </a>
+    </div>
+  );
+}
+
+const App = () => {
+  // State is now correctly typed as ThemeKey
+  const [currentTheme, setTheme] = useState<ThemeKey>('orange');
+
+  // Utility to grab the theme's accent color name (Type safe indexing)
+  const themeAccent = useMemo(() => themeColors[currentTheme].accent, [currentTheme]);
+
+
+  // Utility to build image URL with dynamic accent color (Type safe indexing)
+  const dynamicImageUrl = useMemo(() => {
+    // If the user has changed the URL to a custom value, use it directly.
+    // The previous default was the placeholder template.
+    const isCustomImage = resumeData.imageUrl !== '/j.jpg';
+    
+    if (isCustomImage) {
+      // Use the user's defined image URL
+      return resumeData.imageUrl; 
+    }
+
+    // Otherwise, generate the theme-specific placeholder URL
+    const code = themeColors[currentTheme].code;
+    return `j.jpg`;
+  }, [currentTheme]);
+
+
+  // Explicit class maps for complex/failing dynamic classes (Fixes Tailwind JIT issues)
+  const themeClasses = useMemo(() => {
+    // Mapping for complex classes that need explicit definition
+    const profileShadowMap: Record<ThemeKey, string> = {
+        orange: 'shadow-orange-900/50',
+        sky: 'shadow-sky-900/50',
+        emerald: 'shadow-emerald-900/50',
+        rose: 'shadow-rose-900/50',
+    };
+    const footerBgMap: Record<ThemeKey, string> = {
+        orange: 'bg-orange-800',
+        sky: 'bg-sky-800',
+        emerald: 'bg-emerald-800',
+        rose: 'bg-rose-800',
+    };
+    const ctaTextColorMap: Record<ThemeKey, string> = {
+        orange: 'text-orange-800',
+        sky: 'text-sky-800',
+        emerald: 'text-emerald-800',
+        rose: 'text-rose-800',
+    };
+    const imageBorderMap: Record<ThemeKey, string> = {
+      orange: 'border-orange-600',
+      sky: 'border-sky-600',
+      emerald: 'border-emerald-600',
+      rose: 'border-rose-600',
+    };
+    
+    return {
+        profileShadow: profileShadowMap[currentTheme] || profileShadowMap.orange,
+        footerBg: footerBgMap[currentTheme] || footerBgMap.orange,
+        ctaTextColor: ctaTextColorMap[currentTheme] || ctaTextColorMap.orange,
+        imageBorder: imageBorderMap[currentTheme] || imageBorderMap.orange,
+        // Simple classes are fine with interpolation if the shades are fixed (e.g., -700, -400)
+        topBannerBg: `bg-${themeAccent}-700`,
+        profileTitleColor: `text-${themeAccent}-400`,
+    };
+  }, [currentTheme, themeAccent]);
+
+
+  // Handler to fix the onError property access (Fixes 2339)
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    // Remove the error handler to prevent an infinite loop if the fallback also fails
+    target.onerror = null; 
+    // Set a fallback placeholder image
+    target.src = 'https://placehold.co/400x400/FF5722/ffffff?text=Image+Error';
+  };
+
+
+  return (
+    <div className="min-h-screen bg-gray-900 font-sans antialiased text-white">
+      
+      {/* Theme Selector UI */}
+      <ThemeSelector currentTheme={currentTheme} setTheme={setTheme} />
+
+      {/* Top Banner (Dynamic background color) */}
+      <div className={`${themeClasses.topBannerBg} py-3 text-center shadow-lg`}>
+        <p className="text-sm font-semibold tracking-widest uppercase">
+          {resumeData.name}: ONLINE RESUME
+        </p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* --- 1. PROFILE / ABOUT ME SECTION --- */}
+        {/* Using explicit shadow class */}
+        <div className={`flex flex-col md:flex-row items-center md:items-start bg-gray-800 p-8 rounded-2xl shadow-2xl ${themeClasses.profileShadow} mb-16`}>
+          <div className="md:w-3/4 order-2 md:order-1 pt-6 md:pt-0 md:pr-10">
+            <h1 className="text-5xl sm:text-6xl font-black text-white mb-2">
+              {resumeData.name}
+            </h1>
+            {/* Dynamic text color */}
+            <p className={`text-2xl font-light ${themeClasses.profileTitleColor} mb-6`}>
+              {resumeData.title}
+            </p>
+
+            <SectionHeader icon={User} title="About Me" theme={themeAccent} />
+            <p className="text-gray-300 leading-relaxed text-lg">
+              {resumeData.about}
+            </p>
+          </div>
+
+          {/* Image/Picture Area - Using explicit border class */}
+          <div className="md:w-1/4 order-1 md:order-2 flex justify-center flex-shrink-0">
+            <div className={`w-52 h-52 sm:w-64 sm:h-64 rounded-full border-4 ${themeClasses.imageBorder} p-1 bg-gray-900 overflow-hidden shadow-2xl`}>
+              <img
+                src={dynamicImageUrl}
+                alt="Profile Picture Placeholder"
+                className="w-full h-full object-cover rounded-full transition duration-500 hover:scale-105"
+                // Using the typed handler
+                onError={handleImageError} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* --- MAIN CONTENT GRID (Skills, Experience, Education) --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-16">
+          {/* LEFT COLUMN: Skills and Contact */}
+          <div className="lg:col-span-1 space-y-10">
+            {/* Skills Card */}
+            <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
+              <SectionHeader icon={Code} title="Top Skills" theme={themeAccent} />
+              <div className="flex flex-wrap gap-2">
+                {resumeData.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    // Dynamic background color (uses simple interpolation which should be fine)
+                    className={`px-4 py-1.5 bg-${themeAccent}-600 text-white text-sm font-medium rounded-full hover:bg-${themeAccent}-700 transition`}
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact Card */}
+            <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
+              <SectionHeader icon={Phone} title="Contact Info" theme={themeAccent} />
+              <div className="space-y-4">
+                {/* Email and Phone have links */}
+                <ContactItem icon={Mail} label="Email" value={resumeData.contact.email} link={`mailto:${resumeData.contact.email}`} theme={themeAccent} />
+                <ContactItem icon={Phone} label="Phone" value={resumeData.contact.phone} link={`tel:${resumeData.contact.phone.replace(/\s+/g, '')}`} theme={themeAccent} />
+                {/* Location does not need a link, relies on optional prop */}
+                <ContactItem icon={MapPin} label="Location" value={resumeData.contact.location} theme={themeAccent} />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Experience and Education */}
+          <div className="lg:col-span-2 space-y-10">
+            {/* Work Experience */}
+            <div>
+              <SectionHeader icon={Briefcase} title="Work Experience" theme={themeAccent} />
+              {resumeData.experience.map((job) => (
+                <CardEntry
+                  key={job.id}
+                  title={job.title}
+                  subtitle={job.company}
+                  duration={job.duration}
+                  description={job.description}
+                  theme={themeAccent}
+                />
+              ))}
+            </div>
+
+            {/* Education Background */}
+            <div>
+              <SectionHeader icon={GraduationCap} title="Education Background" theme={themeAccent} />
+              {resumeData.education.map((edu) => (
+                <CardEntry
+                  key={edu.id}
+                  title={edu.degree}
+                  subtitle={edu.institution}
+                  duration={edu.year}
+                  // description is omitted here, relying on the optional prop definition
+                  theme={themeAccent}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* --- PROJECTS SECTION (Grid Layout) --- */}
+        <div className="mb-16">
+          <SectionHeader icon={FolderGit2} title="Recent Projects" theme={themeAccent} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {resumeData.projects.map((project) => (
+              <ProjectCard key={project.id} project={project} theme={themeAccent} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* --- Footer/Bottom CTA (Dynamic background and button colors) --- */}
+      {/* Using explicit background class */}
+      <footer className={`${themeClasses.footerBg} py-10 text-center text-white`}>
+        <h3 className="text-2xl font-semibold mb-2">Ready to discuss your project?</h3>
+        <p className="text-gray-200 mb-6">I am currently available for challenging full-stack roles and consulting opportunities.</p>
+        <a
+          href={`mailto:${resumeData.contact.email}`}
+          // Using explicit text color class
+          className={`inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full ${themeClasses.ctaTextColor} bg-white hover:bg-gray-100 shadow-xl transition transform hover:scale-105`}
+        >
+          <Mail className="w-5 h-5 mr-2" />
+          Contact Me Now
+        </a>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
