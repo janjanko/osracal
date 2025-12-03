@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-// Removing lucide-react dependency and replacing with inline SVGs/Types below.
+// FIX: Removing lucide-react dependency and replacing with inline SVGs/Types below to resolve "Module not found" build error.
 
 // --- Icon Type/Replacements ---
 // Define a simple type for the replacement icon component
 type IconComponent = React.FC<{ className?: string, title?: string }>;
 
-// Inline SVG replacements for Lucide icons
+// FIX: Inline SVG replacements for Lucide icons (Briefcase, GraduationCap, FolderGit2, Mail, Phone, MapPin, ExternalLink, User, Code, Globe, Palette)
 const IconBriefcase: IconComponent = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
 );
@@ -102,7 +102,7 @@ interface ThemeSelectorProps {
   setTheme: (theme: ThemeKey) => void;
 }
 
-// Updated icon type to use the local IconComponent interface
+// FIX: Updated icon type to use the local IconComponent interface
 interface SectionHeaderProps {
   icon: IconComponent;
   title: string;
@@ -117,7 +117,7 @@ interface CardEntryProps {
   theme: string;
 }
 
-// Updated icon type to use the local IconComponent interface
+// FIX: Updated icon type to use the local IconComponent interface
 interface ContactItemProps {
   icon: IconComponent;
   label: string;
@@ -142,51 +142,37 @@ const resumeData: ResumeData = {
   about:
     'A passionate storyteller and dedicated developer with 7+ years of experience crafting beautiful, responsive web applications. Focused on delivering high-performance, accessible, and scalable solutions using modern technologies. My work emphasizes clean architecture and user-centric design, transforming complex requirements into intuitive digital experiences.',
   contact: {
-    email: 'alex.sterling@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
+    email: 'b4staracaln1@gmail.com',
+    phone: '09275101841',
+    location: 'Cogon, Cordova Cebu',
   },
   skills: [
-    'React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Express', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS',
+    'React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Express', 'PostgreSQL',
   ],
   experience: [
     {
       id: 1,
-      title: 'Senior Software Engineer',
-      company: 'Tech Innovators Inc.',
-      duration: '2020 — Present',
+      title: 'McDonalds',
+      company: 'McDonalds Corporation',
+      duration: '2024 — Present',
       description:
-        'Led the development of a high-traffic e-commerce platform using Next.js and Tailwind CSS, resulting in a 30% increase in conversion rates. Mentored junior developers and enforced best practices for testing and code reviews.',
-    },
-    {
-      id: 2,
-      title: 'Frontend Specialist',
-      company: 'Digital Solutions Co.',
-      duration: '2017 — 2020',
-      description:
-        'Designed and implemented responsive user interfaces for over 15 client projects, ensuring cross-browser compatibility and achieving a 95+ PageSpeed score on all deliverables. Introduced atomic design principles to the team.',
-    },
+        'Greeting customers, taking orders, and providing friendly service to ensure a positive dining experience.',
+    }
   ],
   education: [
     {
       id: 1,
-      degree: 'M.S. Computer Science',
-      institution: 'State University of Technology',
-      year: '2015 — 2017',
-    },
-    {
-      id: 2,
-      degree: 'B.A. Graphic Design',
-      institution: 'Art & Design College',
-      year: '2011 — 2015',
-    },
+      degree: 'Bachelor of Science in Information Technology',
+      institution: 'Cordova Public College',
+      year: '2026 - 2027',
+    }
   ],
   projects: [
     {
       id: 1,
-      name: 'EvolveAI',
-      description: 'A platform for generating complex 3D models using generative AI, built with Python and React.',
-      link: 'https://github.com/alex-dev/evolve-ai',
+      name: 'Ecommerce Shop',
+      description: ' An online ecommerce shop',
+      link: 'https://jake-finalproject.vercel.app/',
     },
     {
       id: 2,
@@ -355,7 +341,8 @@ const App = () => {
   const dynamicImageUrl = useMemo(() => {
     // If the user has changed the URL to a custom value, use it directly.
     // The previous default was the placeholder template.
-    const isCustomImage = resumeData.imageUrl !== '/j.jpg';
+    // FIX: Using resumeData.imageUrl directly, as it contains the user's intended path ('/j.jpg' or a custom URL).
+    const isCustomImage = resumeData.imageUrl && resumeData.imageUrl !== '/j.jpg';
     
     if (isCustomImage) {
       // Use the user's defined image URL
@@ -424,6 +411,7 @@ const App = () => {
       {/* Theme Selector UI */}
       <ThemeSelector currentTheme={currentTheme} setTheme={setTheme} />
 
+      {/* Top Banner (Dynamic background color) */}
       <div className={`${themeClasses.topBannerBg} py-3 text-center shadow-lg`}>
         <p className="text-sm font-semibold tracking-widest uppercase">
           {resumeData.name}: ONLINE RESUME
@@ -431,11 +419,14 @@ const App = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* --- 1. PROFILE / ABOUT ME SECTION --- */}
+        {/* Using explicit shadow class */}
         <div className={`flex flex-col md:flex-row items-center md:items-start bg-gray-800 p-8 rounded-2xl shadow-2xl ${themeClasses.profileShadow} mb-16`}>
           <div className="md:w-3/4 order-2 md:order-1 pt-6 md:pt-0 md:pr-10">
             <h1 className="text-5xl sm:text-6xl font-black text-white mb-2">
               {resumeData.name}
             </h1>
+            {/* Dynamic text color */}
             <p className={`text-2xl font-light ${themeClasses.profileTitleColor} mb-6`}>
               {resumeData.title}
             </p>
@@ -446,26 +437,32 @@ const App = () => {
             </p>
           </div>
 
+          {/* Image/Picture Area - Using explicit border class */}
           <div className="md:w-1/4 order-1 md:order-2 flex justify-center flex-shrink-0">
             <div className={`w-52 h-52 sm:w-64 sm:h-64 rounded-full border-4 ${themeClasses.imageBorder} p-1 bg-gray-900 overflow-hidden shadow-2xl`}>
               <img
                 src={dynamicImageUrl}
                 alt="Profile Picture Placeholder"
                 className="w-full h-full object-cover rounded-full transition duration-500 hover:scale-105"
+                // Using the typed handler
                 onError={handleImageError} 
               />
             </div>
           </div>
         </div>
 
+        {/* --- MAIN CONTENT GRID (Skills, Experience, Education) --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-16">
+          {/* LEFT COLUMN: Skills and Contact */}
           <div className="lg:col-span-1 space-y-10">
+            {/* Skills Card */}
             <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
               <SectionHeader icon={IconCode} title="Top Skills" theme={themeAccent} />
               <div className="flex flex-wrap gap-2">
                 {resumeData.skills.map((skill) => (
                   <span
                     key={skill}
+                    // Dynamic background color (uses simple interpolation which should be fine)
                     className={`px-4 py-1.5 bg-${themeAccent}-600 text-white text-sm font-medium rounded-full hover:bg-${themeAccent}-700 transition`}
                   >
                     {skill}
@@ -474,17 +471,22 @@ const App = () => {
               </div>
             </div>
 
+            {/* Contact Card */}
             <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
               <SectionHeader icon={IconPhone} title="Contact Info" theme={themeAccent} />
               <div className="space-y-4">
+                {/* Email and Phone have links */}
                 <ContactItem icon={IconMail} label="Email" value={resumeData.contact.email} link={`mailto:${resumeData.contact.email}`} theme={themeAccent} />
                 <ContactItem icon={IconPhone} label="Phone" value={resumeData.contact.phone} link={`tel:${resumeData.contact.phone.replace(/\s+/g, '')}`} theme={themeAccent} />
+                {/* Location does not need a link, relies on optional prop */}
                 <ContactItem icon={IconMapPin} label="Location" value={resumeData.contact.location} theme={themeAccent} />
               </div>
             </div>
           </div>
 
+          {/* RIGHT COLUMN: Experience and Education */}
           <div className="lg:col-span-2 space-y-10">
+            {/* Work Experience */}
             <div>
               <SectionHeader icon={IconBriefcase} title="Work Experience" theme={themeAccent} />
               {resumeData.experience.map((job) => (
@@ -499,6 +501,7 @@ const App = () => {
               ))}
             </div>
 
+            {/* Education Background */}
             <div>
               <SectionHeader icon={IconGraduationCap} title="Education Background" theme={themeAccent} />
               {resumeData.education.map((edu) => (
@@ -507,6 +510,7 @@ const App = () => {
                   title={edu.degree}
                   subtitle={edu.institution}
                   duration={edu.year}
+                  // description is omitted here, relying on the optional prop definition
                   theme={themeAccent}
                 />
               ))}
@@ -514,6 +518,7 @@ const App = () => {
           </div>
         </div>
 
+        {/* --- PROJECTS SECTION (Grid Layout) --- */}
         <div className="mb-16">
           <SectionHeader icon={IconFolderGit2} title="Recent Projects" theme={themeAccent} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -524,11 +529,14 @@ const App = () => {
         </div>
       </div>
 
+      {/* --- Footer/Bottom CTA (Dynamic background and button colors) --- */}
+      {/* Using explicit background class */}
       <footer className={`${themeClasses.footerBg} py-10 text-center text-white`}>
         <h3 className="text-2xl font-semibold mb-2">Ready to discuss your project?</h3>
         <p className="text-gray-200 mb-6">I am currently available for challenging full-stack roles and consulting opportunities.</p>
         <a
           href={`mailto:${resumeData.contact.email}`}
+          // Using explicit text color class
           className={`inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full ${themeClasses.ctaTextColor} bg-white hover:bg-gray-100 shadow-xl transition transform hover:scale-105`}
         >
           <IconMail className="w-5 h-5 mr-2" />
