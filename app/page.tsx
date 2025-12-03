@@ -176,16 +176,10 @@ const resumeData: ResumeData = {
     },
     {
       id: 2,
-      name: 'Portfolio V4',
-      description: 'Personal responsive portfolio site using Next.js 14, TypeScript and Framer Motion.',
-      link: 'https://portfolio-v4.example.com',
-    },
-    {
-      id: 3,
-      name: 'TaskFlow',
-      description: 'A collaborative project management tool designed for agile teams with real-time updates.',
-      link: 'https://taskflow-app.example.com',
-    },
+      name: 'FCFS CPU SCHEDULING',
+      description: 'Real Time CPU scheduling first come first serve',
+      link: 'https://fcfsjracs.vercel.app/',
+    }
   ],
 };
 
