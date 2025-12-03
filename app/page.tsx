@@ -339,13 +339,9 @@ const App = () => {
 
   // Utility to build image URL with dynamic accent color (Type safe indexing)
   const dynamicImageUrl = useMemo(() => {
-    // If the user has changed the URL to a custom value, use it directly.
-    // The previous default was the placeholder template.
-    // FIX: Using resumeData.imageUrl directly, as it contains the user's intended path ('/j.jpg' or a custom URL).
-    const isCustomImage = resumeData.imageUrl && resumeData.imageUrl !== '/j.jpg';
-    
-    if (isCustomImage) {
-      // Use the user's defined image URL
+    // Check if the user has provided a custom URL.
+    // If resumeData.imageUrl is provided (not empty) AND it's not the generic placeholder path, use it.
+    if (resumeData.imageUrl) {
       return resumeData.imageUrl; 
     }
 
